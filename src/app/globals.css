@@ -1,26 +1,222 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-paper: #ffffff;
+  --color-surface: #f4f4f2;
+  --color-surface-2: #eceae5;
+  --color-ink: #16161a;
+  --color-ink-muted: #5c5c66;
+  --color-line: #e2e2dd;
+  --color-deep: #0c0c0f;
+  --color-deep-line: #2a2a31;
+  --color-deep-muted: #a3a3ad;
+  --color-action: #0067b8;
+  --color-action-hover: #004f8f;
+
+  --color-sq-red: #f25022;
+  --color-sq-green: #7fba00;
+  --color-sq-blue: #00a4ef;
+  --color-sq-yellow: #ffb900;
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.25rem;
+
+  --spacing-gutter: 1.25rem;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: light;
+    /* Header height, read by scroll-margin + hero sizing. */
+    --header-h: 3.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --header-h: 4.5rem;
+    }
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-variation-settings: "wdth" 100;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Every in-page anchor clears the sticky header. */
+  :target,
+  [id] {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-action);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  /* Dark bands need a focus ring that survives on near-black. */
+  .on-deep :focus-visible {
+    outline-color: #ffffff;
+  }
+
+  ::selection {
+    background-color: #cfe6f8;
+    color: var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Width-axis type roles. One family, three voices. */
+  .t-display {
+    font-variation-settings: "wdth" 112, "wght" 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+
+  .t-title {
+    font-variation-settings: "wdth" 106, "wght" 650;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .t-label {
+    font-variation-settings: "wdth" 87, "wght" 600;
+    letter-spacing: 0.005em;
+  }
+
+  .t-num {
+    font-variation-settings: "wdth" 108, "wght" 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.035em;
+    line-height: 0.9;
+  }
+
+  .measure {
+    max-width: 68ch;
+  }
+
+  .measure-tight {
+    max-width: 54ch;
+  }
+}
+
+@keyframes sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes sheet-in {
+  from { transform: translate3d(0, -100%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes sheet-out {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -100%, 0); }
+}
+
+/*
+ * Reveal primitive: GSAP clears these once played. Static when motion is
+ * reduced, and never armed at all unless the .js-motion gate (set inline in
+ * the document head) confirms a script is running to undo it.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-motion [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+}
+
+/*
+ * The opening sequence. CSS rather than GSAP so it starts at first paint:
+ * no wait for hydration, no flash of the final state, and the largest text on
+ * the page is never gated behind a script. Squares assemble, the mission
+ * rises out of its mask, supporting copy follows.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .intro-square {
+    animation: intro-pop 380ms var(--ease-out-quint) backwards;
+  }
+
+  .intro-square:nth-child(1) { animation-delay: 30ms; }
+  .intro-square:nth-child(2) { animation-delay: 70ms; }
+  .intro-square:nth-child(3) { animation-delay: 110ms; }
+  .intro-square:nth-child(4) { animation-delay: 150ms; }
+
+  .intro-line > span {
+    animation: intro-rise 620ms var(--ease-out-quint) backwards;
+  }
+
+  .intro-line:nth-child(1) > span { animation-delay: 100ms; }
+  .intro-line:nth-child(2) > span { animation-delay: 165ms; }
+  .intro-line:nth-child(3) > span { animation-delay: 230ms; }
+
+  /*
+   * The hero paragraph is the element Lighthouse measures for LCP, so these
+   * delays were kept short in case they held it at opacity 0. Measuring with
+   * the fade removed moved LCP not at all — under Lighthouse's simulated
+   * mobile preset the cost is elsewhere — but a sequence that resolves inside
+   * ~750ms reads better anyway.
+   */
+  .intro-fade {
+    animation: intro-fade 460ms var(--ease-out-quint) backwards;
+    animation-delay: 300ms;
+  }
+
+  .intro-fade:first-child {
+    animation-delay: 0ms;
+  }
+}
+
+@keyframes intro-pop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+@keyframes intro-rise {
+  from { transform: translate3d(0, 110%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes intro-fade {
+  from { opacity: 0; transform: translate3d(0, 1rem, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
