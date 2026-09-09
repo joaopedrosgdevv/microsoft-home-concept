@@ -1,83 +1,182 @@
-import { HeroLattice } from "@/components/hero-lattice";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+import { HeroSystem } from "@/components/hero-system";
 import { Action } from "@/components/ui/action";
-import { SQUARE } from "@/lib/content";
+import { SQUARE, platform, type SquareColor } from "@/lib/content";
 
 /**
- * The mission sentence is the hero. It is broken into three typeset lines so
- * the opening can read as one rising movement; on narrow screens each line
- * wraps inside its own mask, which keeps the effect intact without hardcoding
- * a break for every viewport.
+ * The stage.
  *
- * The opening sequence is pure CSS so it begins at first paint rather than
- * after hydration — no flash of the final state, and no JavaScript standing
- * between the visitor and the largest text on the page.
+ * Everything is dark so that the only saturated colour on screen is Microsoft's
+ * own, and so the four quadrants can behave like light sources rather than
+ * swatches. The composition is deliberately weighted: type holds the left third,
+ * the mark holds the right, and the rail closes the frame along the bottom so
+ * the stage reads as a composed shot instead of a page with a large heading on it.
+ *
+ * The rail is not decoration either — it is the accessible half of the graphic.
+ * Pointing at a pillar pushes its quadrant forward and pulls the others back,
+ * which is how the four names and the four squares are stated to be the same
+ * four things.
  */
+
+/*
+ * Rail order follows the mark, not the content file: red and green above,
+ * blue and yellow below. Pointing at the first item has to light the quadrant
+ * in the corner the eye is already on.
+ */
+const RAIL_ORDER: SquareColor[] = ["red", "green", "blue", "yellow"];
+
+const rail = RAIL_ORDER.map((color) => {
+  const pillar = platform.find((p) => p.color === color);
+  if (!pillar) throw new Error(`Sem pilar para a cor ${color}`);
+  return { color, title: pillar.title, lead: pillar.items[0] };
+});
+
+const LINES = ["Inteligência", "em escala", "planetária."];
+
 export function Hero() {
-  const lines = [
-    "Capacitar todas as pessoas",
-    "e organizações do planeta",
-    "a conquistar mais.",
-  ];
+  const [active, setActive] = useState<SquareColor | null>(null);
 
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative isolate overflow-hidden border-b border-line"
+      className="on-void relative isolate overflow-hidden bg-void text-white"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[62%] sm:block"
-      >
-        <HeroLattice />
+      {/* Atmosphere. Four layers, back to front: structure, key light, the
+          cool fill that keeps the shadows from going flat, and grain. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="stage-grid absolute inset-0" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(58% 52% at 72% 30%, rgb(0 106 189 / 0.30) 0%, transparent 72%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(46% 40% at 14% 8%, rgb(96 74 190 / 0.22) 0%, transparent 74%)",
+          }}
+        />
+        <div className="stage-grain absolute inset-0" />
       </div>
 
-      <div className="mx-auto max-w-[100rem] px-gutter md:px-8">
-        <div className="grid grid-cols-12 pt-14 pb-16 sm:pt-20 lg:pt-24 lg:pb-24">
-          <div className="col-span-12 lg:col-span-10">
-            <p className="intro-fade t-label mb-7 flex items-center gap-3 text-label text-ink-muted sm:mb-9">
-              <span className="flex gap-[3px]" aria-hidden="true">
-                {(Object.keys(SQUARE) as (keyof typeof SQUARE)[]).map((k) => (
-                  <span
-                    key={k}
-                    className="intro-square block size-2"
-                    style={{ backgroundColor: SQUARE[k] }}
-                  />
-                ))}
-              </span>
-              Nossa missão
-            </p>
-
+      <div className="relative mx-auto flex min-h-[calc(100svh-5rem)] max-w-[100rem] flex-col px-gutter pt-(--header-h) md:px-8">
+        <div className="grid flex-1 items-center gap-y-8 py-8 sm:py-14 lg:grid-cols-12 lg:gap-x-10 lg:py-14">
+          <div className="order-2 lg:order-1 lg:col-span-6">
             <h1
               id="hero-heading"
-              className="t-display text-[clamp(2rem,5.6vw,5.25rem)] text-ink"
+              className="t-display text-[clamp(2.75rem,7.2vw,5rem)] text-white"
             >
-              {lines.map((line) => (
-                <span
-                  key={line}
-                  className="intro-line block overflow-hidden pb-[0.06em]"
-                >
+              {LINES.map((line) => (
+                // Each line rides up out of its own mask. If it has to wrap on
+                // a narrow screen it wraps inside the mask, so nothing clips.
+                <span key={line} className="rise block overflow-hidden pb-[0.06em]">
                   <span className="block">{line}</span>
                 </span>
               ))}
             </h1>
-          </div>
 
-          <div className="col-span-12 mt-9 sm:mt-11 lg:col-span-6">
-            <p className="intro-fade measure text-[1.0625rem] leading-relaxed text-ink-muted sm:text-[1.1875rem]">
-              Desde 1975, a Microsoft constrói as plataformas sobre as quais
-              outras pessoas constroem: nuvem, inteligência artificial,
-              produtividade e segurança, entregues como infraestrutura de uso
-              geral e não como produto de nicho.
+            <p className="lift mt-7 max-w-[44ch] text-[1.0625rem] leading-[1.65] text-fog sm:text-[1.125rem]">
+              Desde 1975 com a mesma missão: capacitar todas as pessoas e
+              organizações do planeta a conquistar mais.
             </p>
 
-            <div className="intro-fade mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Action href="#plataforma">Conhecer a plataforma</Action>
-              <Action href="#resultados" variant="outline">
-                Ver resultados do ano fiscal
+            <div className="lift lift-late mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Action href="#plataforma" variant="primary">
+                Conhecer a plataforma
+              </Action>
+              <Action href="#resultados" variant="ghost">
+                Ver os resultados
               </Action>
             </div>
           </div>
+
+          <div className="order-1 flex justify-center lg:order-2 lg:col-span-6 lg:justify-end">
+            <HeroSystem active={active} />
+          </div>
         </div>
+
+        {/* The rail. Full width, hairline above, and the last thing before the
+            stage gives way to daylight. */}
+        <nav
+          aria-label="Ecossistema Microsoft"
+          className="lift lift-later border-t border-[var(--edge)] pb-9 sm:pb-11"
+        >
+          <ul className="grid grid-cols-2 lg:grid-cols-4">
+            {rail.map((item, i) => (
+              <li
+                key={item.color}
+                className={[
+                  "border-[var(--edge)]",
+                  i % 2 === 1 ? "border-l" : "",
+                  i > 1 ? "border-t lg:border-t-0" : "",
+                  i > 0 ? "lg:border-l" : "",
+                ].join(" ")}
+              >
+                <Link
+                  href="#plataforma"
+                  onPointerEnter={() => setActive(item.color)}
+                  onPointerLeave={() => setActive(null)}
+                  onFocus={() => setActive(item.color)}
+                  onBlur={() => setActive(null)}
+                  className={[
+                    "group flex min-h-20 flex-col justify-center gap-1.5 py-5",
+                    "pr-4 transition-colors duration-300 hover:bg-white/[0.04] sm:pr-6 lg:min-h-24",
+                    // Leading cell of each row starts flush with the headline.
+                    i % 2 === 0 ? "pl-0" : "pl-4 sm:pl-6",
+                    i === 2 ? "lg:pl-6" : "",
+                  ].join(" ")}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span
+                      aria-hidden="true"
+                      className="size-2 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-150 group-focus-visible:scale-150"
+                      style={{ backgroundColor: SQUARE[item.color] }}
+                    />
+                    <span className="t-label text-[0.9375rem] text-white">
+                      {item.title}
+                    </span>
+                  </span>
+                  <span className="pl-[1.25rem] text-[0.8125rem] text-fog">
+                    {item.lead}
+                  </span>
+                  <span className="sr-only"> — ver na seção Plataforma</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      {/*
+       * The seam. The stage does not stop at a border — daylight from the next
+       * section rises into it and takes over, so the scroll reads as one move
+       * from night into the page proper.
+       */}
+      <div
+        aria-hidden="true"
+        className="relative h-[clamp(4.5rem,11vh,8rem)]"
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(72% 128% at 50% 122%, rgb(214 228 246 / 0.55) 0%, transparent 68%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 0%, var(--color-surface) 88%)",
+          }}
+        />
       </div>
     </section>
   );

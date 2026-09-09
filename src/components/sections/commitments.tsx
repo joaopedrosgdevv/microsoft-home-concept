@@ -13,7 +13,9 @@ export function Commitments() {
       aria-labelledby="missao-heading"
       className="border-b border-line bg-surface"
     >
-      <div className="mx-auto max-w-[100rem] px-gutter py-20 md:px-8 lg:py-28">
+      {/* Extra air at the top: the section is where the stage hands over to
+          daylight, and the handover needs room to land. */}
+      <div className="mx-auto max-w-[100rem] px-gutter pt-24 pb-20 md:px-8 lg:pt-36 lg:pb-28">
         <div className="grid grid-cols-12 gap-y-8">
           <div className="col-span-12 lg:col-span-6">
             <SectionHeading

@@ -1,12 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo } from "next/font/google";
+import { Archivo, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
 
 /**
- * One family for the whole page. Typographic contrast comes from the width
- * axis, so `wdth` has to be requested explicitly alongside the default
- * weight range.
+ * Two voices, deliberately unalike at the sizes each one works at.
+ *
+ * Schibsted Grotesk speaks only above 2rem: large x-height, closed apertures
+ * and short extenders let a headline sit tight without turning into a slab.
+ * Archivo carries everything below that, where its width axis does the work
+ * the second family would otherwise be needed for — condensed for labels,
+ * normal for reading.
  */
+const display = Schibsted_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-display-face",
+});
+
 const archivo = Archivo({
   subsets: ["latin"],
   axes: ["wdth"],
@@ -60,7 +70,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  // The page opens on the dark stage, so browser chrome should match it
+  // rather than flash white above the hero.
+  themeColor: "#05060a",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -70,7 +82,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={archivo.variable}>
+    // The head script below adds a class to this element before React
+    // hydrates, which is the whole point of it running early.
+    <html
+      lang="pt-BR"
+      className={`${archivo.variable} ${display.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/*
          * Scroll reveals start at opacity 0, so the copy would stay invisible

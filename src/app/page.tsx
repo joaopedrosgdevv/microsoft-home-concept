@@ -29,7 +29,7 @@ export default function Home() {
     <>
       <a
         href="#conteudo"
-        className="t-label sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:bg-ink focus:px-5 focus:text-paper"
+        className="t-label sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-60 focus:inline-flex focus:min-h-11 focus:items-center focus:bg-ink focus:px-5 focus:text-paper"
       >
         Pular para o conteúdo
       </a>

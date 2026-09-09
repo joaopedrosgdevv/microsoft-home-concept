@@ -22,7 +22,7 @@ function SheetOverlay({
   return (
     <SheetPrimitive.Overlay
       className={cn(
-        "fixed inset-0 z-40 bg-ink/35 backdrop-blur-[2px]",
+        "fixed inset-0 z-40 bg-void/75 backdrop-blur-[3px]",
         "data-[state=open]:animate-[sheet-fade-in_220ms_ease-out]",
         "data-[state=closed]:animate-[sheet-fade-out_150ms_ease-in]",
         className,

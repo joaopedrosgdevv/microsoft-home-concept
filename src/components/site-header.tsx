@@ -17,12 +17,20 @@ import {
 import { nav } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
+/*
+ * One colour per destination, in the mark's order, with the fifth left white
+ * because there is no fifth quadrant to borrow from. It only ever shows as a
+ * two-pixel underline, which is as much colour as this bar can carry without
+ * competing with the stage below it.
+ */
+const ACCENT = ["#f25022", "#7fba00", "#00a4ef", "#ffb900", "#ffffff"];
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -31,38 +39,48 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        // Solid rather than translucent: over the two dark bands a blurred
-        // header sampled the brand squares as colour smears, and nav contrast
-        // changed with whatever happened to be scrolling behind it.
-        "sticky top-0 z-40 h-(--header-h) bg-paper",
-        "transition-[border-color] duration-300",
-        scrolled ? "border-b border-line" : "border-b border-transparent",
+        // Out of flow: the hero starts at the top of the viewport and the bar
+        // floats over it, which is the only way the stage reads full-bleed.
+        "on-void fixed inset-x-0 top-0 z-50 h-(--header-h) text-white",
+        "transition-[background-color,border-color,backdrop-filter] duration-500",
+        // Dark glass rather than a colour that follows the section underneath:
+        // the bar keeps one contrast relationship for the whole page, so the
+        // links never have to change colour mid-scroll.
+        scrolled
+          ? "border-b border-[var(--edge)] bg-void/80 backdrop-blur-xl"
+          : "border-b border-transparent",
       )}
     >
-      <div className="mx-auto flex h-full max-w-[100rem] items-center gap-6 px-gutter md:px-8">
+      <div className="mx-auto flex h-full max-w-[100rem] items-center gap-8 px-gutter md:px-8">
         <Link
           href="/"
-          className="-mx-2 flex h-11 items-center px-2"
+          className="-mx-2 flex h-11 items-center px-2 text-white"
           aria-label="Microsoft — página inicial"
         >
           <MicrosoftLockup />
         </Link>
 
         <nav aria-label="Principal" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
-            {nav.map((item) => (
+          <ul className="flex items-center">
+            {nav.map((item, i) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   className={cn(
-                    "relative flex h-11 items-center px-3 text-[0.9375rem] t-label text-ink-muted",
-                    "transition-colors duration-200 hover:text-ink",
-                    "after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left",
-                    "after:scale-x-0 after:bg-ink after:transition-transform after:duration-300",
-                    "after:ease-[cubic-bezier(0.22,1,0.36,1)] hover:after:scale-x-100",
+                    "group/nav t-label relative flex h-11 items-center px-3.5 text-[0.9375rem]",
+                    "text-white/70 transition-colors duration-200 hover:text-white",
                   )}
                 >
                   {item.label}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "pointer-events-none absolute inset-x-3.5 bottom-1.5 h-0.5 origin-left scale-x-0",
+                      "transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                      "group-hover/nav:scale-x-100 group-focus-visible/nav:scale-x-100",
+                    )}
+                    style={{ backgroundColor: ACCENT[i] }}
+                  />
                 </Link>
               </li>
             ))}
@@ -72,8 +90,9 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           <Action
             href="https://www.microsoft.com/en-us/investor"
-            variant="outline"
-            className="hidden h-11 px-4 text-sm md:inline-flex"
+            variant="ghost"
+            size="sm"
+            className="hidden md:inline-flex"
           >
             Investidores
           </Action>
@@ -81,15 +100,18 @@ export function SiteHeader() {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               className={cn(
-                "-mr-2 flex size-11 items-center justify-center text-ink lg:hidden",
-                "transition-colors duration-200 hover:text-action",
+                "-mr-2 flex size-11 items-center justify-center text-white lg:hidden",
+                "transition-colors duration-200 hover:text-sq-blue",
               )}
               aria-label="Abrir menu de navegação"
             >
               <Menu aria-hidden="true" className="size-5" />
             </SheetTrigger>
 
-            <SheetContent aria-describedby={undefined}>
+            <SheetContent
+              aria-describedby={undefined}
+              className="on-void border-[var(--edge)] bg-void text-white"
+            >
               <SheetTitle className="sr-only">Navegação</SheetTitle>
               <SheetDescription className="sr-only">
                 Seções da página inicial da Microsoft
@@ -99,8 +121,8 @@ export function SiteHeader() {
                 <MicrosoftLockup />
                 <SheetClose
                   className={cn(
-                    "-mr-2 ml-auto flex size-11 items-center justify-center text-ink",
-                    "transition-colors duration-200 hover:text-action",
+                    "-mr-2 ml-auto flex size-11 items-center justify-center text-white",
+                    "transition-colors duration-200 hover:text-sq-blue",
                   )}
                   aria-label="Fechar menu de navegação"
                 >
@@ -111,24 +133,19 @@ export function SiteHeader() {
               <nav aria-label="Principal (mobile)" className="px-gutter pb-8">
                 <ul>
                   {nav.map((item, i) => (
-                    <li key={item.href} className="border-t border-line">
+                    <li
+                      key={item.href}
+                      className="border-t border-[var(--edge)]"
+                    >
                       <SheetClose asChild>
                         <Link
                           href={item.href}
-                          className="flex min-h-14 items-center gap-4 py-3 text-[1.375rem] t-title text-ink"
+                          className="t-display flex min-h-16 items-center gap-4 py-3 text-[1.5rem] text-white"
                         >
                           <span
                             aria-hidden="true"
-                            className="size-2 shrink-0"
-                            style={{
-                              backgroundColor: [
-                                "#f25022",
-                                "#7fba00",
-                                "#00a4ef",
-                                "#ffb900",
-                                "#5c5c66",
-                              ][i],
-                            }}
+                            className="size-2.5 shrink-0"
+                            style={{ backgroundColor: ACCENT[i] }}
                           />
                           {item.label}
                         </Link>
@@ -139,8 +156,8 @@ export function SiteHeader() {
 
                 <Action
                   href="https://www.microsoft.com/en-us/investor"
-                  variant="outline"
-                  className="mt-6 w-full"
+                  variant="ghost"
+                  className="mt-7 w-full"
                 >
                   Relações com investidores
                 </Action>

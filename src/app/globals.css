@@ -13,12 +13,24 @@
   --color-action: #0067b8;
   --color-action-hover: #004f8f;
 
+  /*
+   * The stage. Not a grey ramp — the darks carry a trace of blue so the four
+   * brand colours read as light falling on something rather than as flat fills
+   * pasted onto black.
+   */
+  --color-void: #05060a;
+  --color-void-2: #0a0c14;
+  --color-panel: #11141d;
+  --color-mist: #ced3e0;
+  --color-fog: #9aa1b4;
+
   --color-sq-red: #f25022;
   --color-sq-green: #7fba00;
   --color-sq-blue: #00a4ef;
   --color-sq-yellow: #ffb900;
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), var(--font-archivo), sans-serif;
 
   --text-label: 0.8125rem;
   --text-label--line-height: 1.25rem;
@@ -26,13 +38,18 @@
   --spacing-gutter: 1.25rem;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
   :root {
     color-scheme: light;
     /* Header height, read by scroll-margin + hero sizing. */
-    --header-h: 3.75rem;
+    --header-h: 3.5rem;
+    /* Hairline on the dark stage. Too faint to see as a line, enough to
+       describe an edge. */
+    --edge: rgb(255 255 255 / 0.09);
+    --edge-strong: rgb(255 255 255 / 0.18);
   }
 
   @media (min-width: 1024px) {
@@ -48,6 +65,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    background-color: var(--color-void);
   }
 
   body {
@@ -72,7 +90,8 @@
   }
 
   /* Dark bands need a focus ring that survives on near-black. */
-  .on-deep :focus-visible {
+  .on-deep :focus-visible,
+  .on-void :focus-visible {
     outline-color: #ffffff;
   }
 
@@ -83,11 +102,16 @@
 }
 
 @layer utilities {
-  /* Width-axis type roles. One family, three voices. */
+  /*
+   * Display is the only role that switches family. It runs at 2rem and up,
+   * where Schibsted's short extenders let the leading close to 0.94 without
+   * lines colliding — the reason the headline can be big and still compact.
+   */
   .t-display {
-    font-variation-settings: "wdth" 112, "wght" 700;
-    letter-spacing: -0.03em;
-    line-height: 0.95;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.94;
     text-wrap: balance;
   }
 
@@ -119,24 +143,257 @@
   }
 }
 
+/* ==========================================================================
+   The stage
+   ========================================================================== */
+
+/*
+ * Grain. Three per cent of a turbulence field, multiplied over the darks.
+ * It is the difference between a black rectangle and a lit room: without it
+ * the large gradients band visibly on 8-bit displays.
+ */
+.stage-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+}
+
+/* A flat structural grid, not a perspective floor: it describes a plan, and
+   it is only just visible. */
+.stage-grid {
+  background-image:
+    linear-gradient(to right, var(--edge) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--edge) 1px, transparent 1px);
+  background-size: 7rem 7rem;
+  opacity: 0.32;
+  mask-image: radial-gradient(
+    120% 90% at 50% 32%,
+    #000 0%,
+    rgb(0 0 0 / 0.5) 55%,
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   The mark, exploded
+   ========================================================================== */
+
+.sys {
+  perspective: 1800px;
+  perspective-origin: 50% 44%;
+}
+
+.sys-space {
+  transform-style: preserve-3d;
+  transform: rotateX(-11deg) rotateY(-16deg);
+  will-change: transform;
+}
+
+/*
+ * Two nested elements, because two things move this tile and they must not
+ * fight over one `transform`: GSAP owns the outer node's depth (the opening
+ * sequence and the parallax), CSS owns the inner face's lift on hover.
+ */
+.sys-node {
+  position: absolute;
+  transform: translate3d(0, 0, var(--z, 0px));
+  transform-style: preserve-3d;
+}
+
+.sys-tile {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  transform-style: preserve-3d;
+  /* Lit glass: a specular corner over a body that darkens into the stage,
+     a bright rim, and the colour the tile throws onto everything behind it. */
+  background:
+    radial-gradient(
+      118% 118% at 24% 16%,
+      rgb(255 255 255 / 0.62) 0%,
+      rgb(255 255 255 / 0.08) 42%,
+      transparent 64%
+    ),
+    linear-gradient(
+      152deg,
+      var(--c) 0%,
+      color-mix(in oklab, var(--c) 58%, #05060a) 100%
+    );
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--c) 45%, #ffffff),
+    0 0 2.5rem -0.25rem color-mix(in oklab, var(--c) 65%, transparent),
+    0 1.75rem 4rem -1.5rem color-mix(in oklab, var(--c) 80%, transparent);
+  transition:
+    transform 620ms var(--ease-out-expo),
+    box-shadow 620ms var(--ease-out-expo),
+    filter 420ms ease-out;
+}
+
+/* The travelling highlight. One sweep across all four, so they read as four
+   surfaces under one light rather than four independent objects. */
+.sys-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    rgb(255 255 255 / 0.5) 50%,
+    transparent 66%
+  );
+  background-size: 320% 100%;
+  background-position: 130% 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sys-tile::after {
+    animation: sys-sweep 7.5s var(--ease-out-quint) infinite;
+  }
+}
+
+@keyframes sys-sweep {
+  0%,
+  62% {
+    background-position: 130% 0;
+  }
+  92%,
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+/* The light each tile throws. Gradients rather than a blur filter: same
+   result, none of the compositing cost on a layer this large. */
+.sys-cast {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--c) 42%, transparent) 0%,
+    transparent 100%
+  );
+  transition: opacity 620ms var(--ease-out-expo);
+}
+
+/* Pointing at a pillar in the rail lifts its tile out of the stack and pulls
+   the others back, so the connection is stated by depth rather than by a
+   colour change alone. */
+.sys[data-active] .sys-tile {
+  filter: saturate(0.55) brightness(0.62);
+}
+
+.sys[data-active] .sys-tile[data-live] {
+  filter: none;
+  transform: translate3d(0, 0, 120px) scale(1.05);
+}
+
+.sys[data-active] .sys-cast {
+  opacity: 0.25;
+}
+
+.sys[data-active] .sys-cast[data-live] {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Opening sequence
+   ========================================================================== */
+
+/*
+ * Type opens in CSS so it starts at first paint: no wait for hydration and
+ * no script standing between the visitor and the largest text on the page.
+ * The mark opens in GSAP, because flying four tiles in from depth, letting
+ * them resolve into the logo and then relaxing them apart is one timeline,
+ * and a timeline is what GSAP is for.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .rise > span {
+    animation: rise 780ms var(--ease-out-expo) backwards;
+  }
+
+  .rise:nth-child(1) > span {
+    animation-delay: 80ms;
+  }
+  .rise:nth-child(2) > span {
+    animation-delay: 160ms;
+  }
+  .rise:nth-child(3) > span {
+    animation-delay: 240ms;
+  }
+
+  .lift {
+    animation: lift 620ms var(--ease-out-expo) backwards;
+    animation-delay: 340ms;
+  }
+
+  .lift-late {
+    animation-delay: 440ms;
+  }
+
+  .lift-later {
+    animation-delay: 560ms;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lift {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.875rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ==========================================================================
+   Sheet
+   ========================================================================== */
+
 @keyframes sheet-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes sheet-fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes sheet-in {
-  from { transform: translate3d(0, -100%, 0); }
-  to { transform: translate3d(0, 0, 0); }
+  from {
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @keyframes sheet-out {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, -100%, 0); }
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -100%, 0);
+  }
 }
 
 /*
@@ -151,62 +408,6 @@
   }
 }
 
-/*
- * The opening sequence. CSS rather than GSAP so it starts at first paint:
- * no wait for hydration, no flash of the final state, and the largest text on
- * the page is never gated behind a script. Squares assemble, the mission
- * rises out of its mask, supporting copy follows.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .intro-square {
-    animation: intro-pop 380ms var(--ease-out-quint) backwards;
-  }
-
-  .intro-square:nth-child(1) { animation-delay: 30ms; }
-  .intro-square:nth-child(2) { animation-delay: 70ms; }
-  .intro-square:nth-child(3) { animation-delay: 110ms; }
-  .intro-square:nth-child(4) { animation-delay: 150ms; }
-
-  .intro-line > span {
-    animation: intro-rise 620ms var(--ease-out-quint) backwards;
-  }
-
-  .intro-line:nth-child(1) > span { animation-delay: 100ms; }
-  .intro-line:nth-child(2) > span { animation-delay: 165ms; }
-  .intro-line:nth-child(3) > span { animation-delay: 230ms; }
-
-  /*
-   * The hero paragraph is the element Lighthouse measures for LCP, so these
-   * delays were kept short in case they held it at opacity 0. Measuring with
-   * the fade removed moved LCP not at all — under Lighthouse's simulated
-   * mobile preset the cost is elsewhere — but a sequence that resolves inside
-   * ~750ms reads better anyway.
-   */
-  .intro-fade {
-    animation: intro-fade 460ms var(--ease-out-quint) backwards;
-    animation-delay: 300ms;
-  }
-
-  .intro-fade:first-child {
-    animation-delay: 0ms;
-  }
-}
-
-@keyframes intro-pop {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
-}
-
-@keyframes intro-rise {
-  from { transform: translate3d(0, 110%, 0); }
-  to { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes intro-fade {
-  from { opacity: 0; transform: translate3d(0, 1rem, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -218,5 +419,11 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  /* The stage still has to look composed when nothing moves, so the tiles
+     stay where the timeline would have left them. */
+  .sys-space {
+    transform: rotateX(-11deg) rotateY(-16deg);
   }
 }
