@@ -659,3 +659,348 @@
 .assemble {
   transition: box-shadow 700ms var(--ease-out-expo);
 }
+
+/* ==========================================================================
+   Accessibility — the interface adapts to you
+   ========================================================================== */
+
+.ax {
+  /* Where the window is, how big it is, and how the stack is turned. The
+     defaults are the composition a visitor sees with scripting off or reduced
+     motion on, so they are chosen to look composed rather than neutral. */
+  --lx: 50%;
+  --ly: 47%;
+  --lr: clamp(3.5rem, 9vw, 6.5rem);
+  --lf: 1.35rem;
+  --rx: -5.6deg;
+  --ry: -12deg;
+  /* Vertical panning still belongs to the page; a sideways drag moves the
+     window. When the browser claims the gesture it sends pointercancel. */
+  touch-action: pan-y;
+}
+
+/*
+ * Both copies carry their own perspective, at the same value and the same
+ * origin, so the two renderings land in exact register. The lens copy cannot
+ * inherit it: `mask` makes an element a group, which forces its own
+ * transform-style back to flat.
+ */
+.ax-layer {
+  position: absolute;
+  inset: 0;
+  perspective: 1500px;
+  perspective-origin: 50% 45%;
+}
+
+.ax-space {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  will-change: transform;
+}
+
+/*
+ * The window. Two gradients crossed rather than a circle: square is the shape
+ * this whole page is built from, and a rectangle reads as a viewport onto the
+ * same thing rather than as a magnifying glass held over it. The soft ramp at
+ * each edge is what keeps it from looking like a cut-out.
+ */
+.ax-lens {
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      transparent calc(var(--lx) - var(--lr) - var(--lf)),
+      #000 calc(var(--lx) - var(--lr)),
+      #000 calc(var(--lx) + var(--lr)),
+      transparent calc(var(--lx) + var(--lr) + var(--lf))
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(var(--ly) - var(--lr) - var(--lf)),
+      #000 calc(var(--ly) - var(--lr)),
+      #000 calc(var(--ly) + var(--lr)),
+      transparent calc(var(--ly) + var(--lr) + var(--lf))
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent calc(var(--lx) - var(--lr) - var(--lf)),
+      #000 calc(var(--lx) - var(--lr)),
+      #000 calc(var(--lx) + var(--lr)),
+      transparent calc(var(--lx) + var(--lr) + var(--lf))
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(var(--ly) - var(--lr) - var(--lf)),
+      #000 calc(var(--ly) - var(--lr)),
+      #000 calc(var(--ly) + var(--lr)),
+      transparent calc(var(--ly) + var(--lr) + var(--lf))
+    );
+  mask-composite: intersect;
+}
+
+.ax-pane {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  height: var(--h);
+  transform: translate3d(0, 0, var(--z));
+  transform-style: preserve-3d;
+}
+
+/*
+ * One deck fanned open in space, not four boxes placed on a background: same
+ * size, cascading down, and separated by depth rather than by distance. That
+ * is what makes the field read as a single installation the window travels
+ * over, and it is what keeps the four modes from looking like a card grid.
+ *
+ * Depth is real, so the parallax is free: one rotation on the stack moves
+ * these by four different amounts.
+ */
+.ax-p1 {
+  --l: 50%;
+  --t: 40%;
+  --w: 42%;
+  --h: 33%;
+  --z: 20px;
+}
+.ax-p2 {
+  --l: 32%;
+  --t: 58%;
+  --w: 42%;
+  --h: 33%;
+  --z: -60px;
+}
+.ax-p3 {
+  --l: 17%;
+  --t: 8%;
+  --w: 42%;
+  --h: 33%;
+  --z: 200px;
+}
+.ax-p4 {
+  --l: 1%;
+  --t: 27%;
+  --w: 42%;
+  --h: 33%;
+  --z: -180px;
+}
+
+/* The light the pane throws. Anchored to the pane that casts it — the same
+   device as the mark in the hero, not an unattached glow. */
+.ax-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--c) 15%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+.ax-face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in oklab, var(--c) 38%, transparent);
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in oklab, var(--c) 13%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.04) 0%,
+      rgb(255 255 255 / 0.012) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.08),
+    0 1.5rem 3.5rem -1.5rem color-mix(in oklab, var(--c) 70%, transparent);
+}
+
+.ax-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.875rem 0.875rem;
+}
+
+.ax-mark {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  color: var(--c);
+  stroke-width: var(--sw);
+}
+
+.ax-head {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+}
+
+/*
+ * A pool of shade under the two words. The panes are translucent and they do
+ * overlap, so a label can land on the drawing of the pane behind it; this puts
+ * a consistent ground under the type wherever it falls. Elliptical and anchored
+ * at the left so it has no edge anywhere — a hard-edged plate would read as a
+ * chip, and the window sliding across a chip is what it looked like before.
+ */
+.ax-head::before {
+  content: "";
+  position: absolute;
+  inset: -0.5rem -1rem -0.5rem -0.75rem;
+  background: radial-gradient(
+    115% 130% at 0% 50%,
+    rgb(5 6 10 / 0.82) 0%,
+    rgb(5 6 10 / 0.45) 48%,
+    transparent 76%
+  );
+}
+
+.ax-head > * {
+  position: relative;
+}
+
+/* Set larger than the mode name above it: the name is the question and this is
+   the answer, and it is also the one word the pane exists to hand over. The
+   panes are rotated away from the viewer, so anything set at label size here
+   arrives smaller than it measures. */
+.ax-word {
+  color: var(--c);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+
+/*
+ * The two readings. Outside the window the pane is what ships when nobody was
+ * considered: thin strokes, low contrast, colour drained out. Inside it,
+ * the same pane with everything accessibility puts back.
+ */
+.ax-base .ax-face {
+  opacity: 0.72;
+  filter: saturate(0.4);
+}
+
+.ax-base .ax-glow {
+  opacity: 0.6;
+}
+
+/* The reveal is meant to read as contrast, not as a lamp behind the pane, so
+   the light stays where it was and only the drawing changes. */
+.ax-lens .ax-glow {
+  opacity: 0.8;
+}
+
+.ax-base .ax-mark {
+  --sw: 1;
+  opacity: 0.6;
+  filter: saturate(0.35);
+}
+
+/* The base copy holds the chip's space without showing it, so the mark keeps
+   the same size in both readings and nothing resizes as the window passes. */
+.ax-base .ax-word {
+  visibility: hidden;
+}
+
+.ax-lens .ax-mark {
+  --sw: 1.75;
+}
+
+/* The frame. Quadrant colours at the corners in the mark's own order, so the
+   window belongs to the logo rather than to a cursor plugin. */
+.ax-window {
+  position: absolute;
+  left: var(--lx);
+  top: var(--ly);
+  width: calc(var(--lr) * 2);
+  height: calc(var(--lr) * 2);
+  translate: -50% -50%;
+  border: 1px solid rgb(255 255 255 / 0.26);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.4),
+    0 0 3.5rem -0.75rem rgb(255 255 255 / 0.16);
+  pointer-events: none;
+}
+
+/* Set outside the frame rather than on it. Sitting on the corners they landed
+   on whatever the window was uncovering — a green square through the middle of
+   a revealed word reads as a rendering fault — and outside them they behave
+   like registration marks, which is what they are. */
+.ax-window span {
+  --o: calc(-0.375rem - 3px);
+  position: absolute;
+  width: 0.375rem;
+  height: 0.375rem;
+}
+
+.ax-window span:nth-child(1) {
+  top: var(--o);
+  left: var(--o);
+  background: #f25022;
+}
+.ax-window span:nth-child(2) {
+  top: var(--o);
+  right: var(--o);
+  background: #7fba00;
+}
+.ax-window span:nth-child(3) {
+  bottom: var(--o);
+  left: var(--o);
+  background: #00a4ef;
+}
+.ax-window span:nth-child(4) {
+  bottom: var(--o);
+  right: var(--o);
+  background: #ffb900;
+}
+
+/* Narrow screens get a portrait cascade rather than a squashed fan. */
+@media (max-width: 639px) {
+  .ax-p1 {
+    --l: 4%;
+    --t: 23%;
+    --w: 64%;
+    --h: 26%;
+    --z: -25px;
+  }
+  .ax-p2 {
+    --l: 2%;
+    --t: 70%;
+    --w: 60%;
+    --h: 25%;
+    --z: 90px;
+  }
+  .ax-p3 {
+    --l: 30%;
+    --t: 46%;
+    --w: 64%;
+    --h: 26%;
+    --z: 165px;
+  }
+  .ax-p4 {
+    --l: 22%;
+    --t: 0%;
+    --w: 56%;
+    --h: 24%;
+    --z: -150px;
+  }
+
+  .ax-body {
+    gap: 0.375rem;
+    padding: 0.5rem 0.625rem 0.625rem;
+  }
+
+  .ax-word {
+    font-size: 0.8125rem;
+  }
+}

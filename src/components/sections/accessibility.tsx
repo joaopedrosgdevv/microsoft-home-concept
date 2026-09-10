@@ -1,134 +1,140 @@
 import { ArrowUpRight } from "lucide-react";
 
+import { AccessibilityField } from "@/components/accessibility-field";
+import { Action } from "@/components/ui/action";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { accessibility, elevate } from "@/lib/content";
 
 /**
- * The one section in daylight.
+ * The second climax.
  *
- * The page is a dark stage from the hero down, and it stays that way until
- * here. This section argues that things should be easy to read, so it is the
- * one you read in full light — at the largest body size on the page, on the
- * highest-contrast surface, with the widest leading. The break also gives the
- * scroll a breath before the close, which a page this dark needs.
+ * The hero takes the mark apart to say the company is a system. This section
+ * takes the interface apart to say the same thing about the people using it —
+ * and it is the only place on the page where the visitor's own movement
+ * changes what is on screen, which is the argument acted out rather than
+ * described.
  *
- * Accessibility and Elevate share the band: both are the same argument about
- * who gets to take part, one about who can use the products and one about who
- * can learn to build with them.
+ * The composition is weighted the other way round from the hero on purpose:
+ * there the type holds the left and the object the right at equal size, here
+ * the field is much the larger half and the type sits beside it as a caption.
+ * Same room, different shot.
+ *
+ * The band at the foot is editorial, not a card grid: two rows, each a name
+ * against a line of prose, divided by hairlines. One is about who can get help
+ * with the products, the other about who can learn to build with them.
  */
 export function Accessibility() {
   return (
     <section
       id="acessibilidade"
       aria-labelledby="acessibilidade-heading"
-      className="on-day relative isolate overflow-hidden bg-day text-ink"
+      className="on-void relative isolate overflow-hidden bg-void text-white"
     >
-      {/* Night gives way. The stage does not stop at a border: it thins out
-          into the light the section is set in. */}
-      <div
-        aria-hidden="true"
-        className="relative h-[clamp(6rem,15vh,10.5rem)]"
-        style={{
-          background:
-            "linear-gradient(to bottom, var(--color-void) 0%, rgb(5 6 10 / 0.94) 16%, rgb(5 6 10 / 0.74) 33%, rgb(5 6 10 / 0.44) 54%, rgb(5 6 10 / 0.16) 78%, transparent 100%)",
-        }}
-      />
-
+      {/* No seam at the top. The section before this one already closes into
+          the dark, and the field supplies its own light. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="stage-grid-day absolute inset-0" />
-      </div>
-
-      <div className="relative mx-auto max-w-[100rem] px-gutter pb-8 md:px-8">
-        <div className="grid gap-y-8 lg:grid-cols-12 lg:gap-x-12">
-          <SectionHeading
-            id="acessibilidade-heading"
-            title="Projetado para ser usável por mais pessoas"
-            tone="day"
-            size="lg"
-            className="lg:col-span-7"
-          />
-          <p
-            data-reveal
-            className="measure-tight self-end text-[1.1875rem] leading-[1.75] text-ink lg:col-span-5"
-          >
-            {accessibility.lead}
-          </p>
-        </div>
-
-        {/* Set large and open. This is the part of the page where line length,
-            leading and contrast are the argument, so they are held to the
-            comfortable end of the range rather than the compact one. */}
-        <ul className="mt-12 border-t border-ink lg:mt-16">
-          {accessibility.points.map((p) => (
-            <li
-              key={p.title}
-              data-reveal
-              className="grid gap-y-4 border-b border-day-line py-9 lg:grid-cols-12 lg:gap-x-12 lg:py-12"
-            >
-              <h3 className="t-display flex items-start gap-4 text-[clamp(1.5rem,3.2vw,2.25rem)] text-ink lg:col-span-6">
-                <span
-                  aria-hidden="true"
-                  className="mt-[0.4em] block size-3 shrink-0 bg-sq-blue"
-                />
-                {p.title}
-              </h3>
-              <p className="text-[1.125rem] leading-[1.75] text-ink lg:col-span-5 lg:col-start-8">
-                {p.body}
-              </p>
-            </li>
-          ))}
-        </ul>
-
-        <p data-reveal className="mt-10">
-          <a
-            href={accessibility.source}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="t-label inline-flex min-h-11 items-center gap-1.5 text-[1rem] text-action underline decoration-action/35 underline-offset-[6px] transition-colors duration-200 hover:text-action-hover hover:decoration-action"
-          >
-            Acessibilidade na Microsoft
-            <ArrowUpRight aria-hidden="true" className="size-4" />
-            <span className="sr-only"> (abre em nova aba)</span>
-          </a>
-        </p>
-
-        {/* Elevate. One figure, given a surface of its own. */}
+        <div className="stage-grid absolute inset-0" />
         <div
-          data-reveal
-          className="mt-16 bg-day-2 p-8 sm:p-12 lg:mt-24 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:p-16"
-        >
-          <p className="lg:col-span-4">
-            <span className="t-num block text-[clamp(3.25rem,9vw,5.5rem)] text-ink">
-              {elevate.stat}
-            </span>
-            <span className="t-label mt-4 block text-[0.9375rem] text-ink-muted">
-              Microsoft Elevate, cinco anos
-            </span>
-          </p>
-          <p className="measure mt-6 self-center text-[1.0625rem] leading-[1.75] text-ink lg:col-span-7 lg:col-start-6 lg:mt-0">
-            {elevate.body}{" "}
-            <a
-              href={elevate.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-action underline decoration-action/35 underline-offset-4 transition-colors duration-200 hover:text-action-hover hover:decoration-action"
-            >
-              Ler o anúncio
-              <span className="sr-only"> (abre em nova aba)</span>
-            </a>
-          </p>
-        </div>
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(64% 46% at 76% 42%, rgb(0 106 189 / 0.16) 0%, transparent 74%)",
+          }}
+        />
+        <div className="stage-grain absolute inset-0" />
       </div>
 
-      {/* And the light goes again. */}
-      <div
-        aria-hidden="true"
-        className="relative mt-16 h-[clamp(6rem,15vh,10.5rem)] lg:mt-24"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgb(5 6 10 / 0.16) 22%, rgb(5 6 10 / 0.44) 46%, rgb(5 6 10 / 0.74) 67%, rgb(5 6 10 / 0.94) 84%, var(--color-void) 100%)",
-        }}
-      />
+      <div className="relative mx-auto max-w-[100rem] px-gutter pt-24 pb-24 md:px-8 lg:pt-36 lg:pb-32">
+        <div className="grid items-center gap-y-12 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16">
+          <div className="lg:col-span-5 lg:pr-4">
+            <SectionHeading
+              id="acessibilidade-heading"
+              title={accessibility.headline}
+              size="lg"
+            />
+
+            <p
+              data-reveal
+              className="measure-tight mt-7 text-[1.0625rem] leading-[1.7] text-mist sm:text-[1.125rem]"
+            >
+              {accessibility.lead}
+            </p>
+
+            <p data-reveal className="mt-8">
+              <a
+                href={accessibility.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="t-label inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem] text-white underline decoration-white/30 underline-offset-[6px] transition-colors duration-200 hover:decoration-white"
+              >
+                Acessibilidade na Microsoft
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+                <span className="sr-only"> (abre em nova aba)</span>
+              </a>
+            </p>
+          </div>
+
+          <div data-reveal className="lg:col-span-7">
+            <AccessibilityField />
+          </div>
+        </div>
+
+        <div className="mt-16 border-t border-[var(--edge-strong)] lg:mt-24">
+          <div
+            data-reveal
+            className="grid gap-y-5 border-b border-[var(--edge)] py-8 lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-10"
+          >
+            <h3 className="t-title text-[1.375rem] text-white lg:col-span-3">
+              {accessibility.desk.title}
+            </h3>
+            <p className="text-[1.0625rem] leading-[1.7] text-fog lg:col-span-6">
+              {accessibility.desk.body}
+            </p>
+            <div className="lg:col-span-3 lg:justify-self-end">
+              <Action
+                href={accessibility.desk.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="ghost"
+                size="sm"
+              >
+                {accessibility.desk.cta}
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+                <span className="sr-only"> (abre em nova aba)</span>
+              </Action>
+            </div>
+          </div>
+
+          {/* Elevate belongs to the same argument about who gets to take part,
+              so it keeps its place here — as one line, not as a panel. */}
+          <div
+            data-reveal
+            className="grid gap-y-5 py-8 lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-10"
+          >
+            <h3 className="t-title flex items-baseline gap-3 text-[1.375rem] text-white lg:col-span-3">
+              <span className="t-num text-[1.75rem] text-white">
+                {elevate.stat}
+              </span>
+              Microsoft Elevate
+            </h3>
+            <p className="text-[1.0625rem] leading-[1.7] text-fog lg:col-span-6">
+              {elevate.body}
+            </p>
+            <div className="lg:col-span-3 lg:justify-self-end">
+              <a
+                href={elevate.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="t-label inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem] text-white underline decoration-white/30 underline-offset-[6px] transition-colors duration-200 hover:decoration-white"
+              >
+                Ler o anúncio
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+                <span className="sr-only"> (abre em nova aba)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

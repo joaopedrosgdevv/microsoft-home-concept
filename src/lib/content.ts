@@ -217,21 +217,28 @@ export const sustainability = {
 
 export const accessibility = {
   source: "https://www.microsoft.com/pt-br/accessibility",
-  lead: "Acessibilidade é tratada como parte do produto, não como correção posterior. A meta declarada da empresa é tornar a acessibilidade mais simples para todos.",
-  points: [
-    {
-      title: "Disability Answer Desk",
-      body: "Suporte dedicado a clientes com deficiência em Microsoft 365, Windows, Xbox e Surface, por chat, telefone ou língua de sinais americana (ASL).",
-    },
-    {
-      title: "IA testada com tecnologia assistiva",
-      body: "Agentes de IA são avaliados com leitores de tela e navegação por teclado antes de chegarem aos clientes.",
-    },
-    {
-      title: "European Accessibility Act",
-      body: "Atualizações em produtos como Windows, Teams e Outlook para alinhamento às normas de acessibilidade da União Europeia.",
-    },
+  headline: "Projetado para cada forma de interagir.",
+  lead: "A acessibilidade não entra depois. Ela nasce com o produto — para diferentes maneiras de ver, ouvir, mover e compreender.",
+
+  /*
+   * The four modes the section is built around, each paired with the provision
+   * that answers it. `name` is what the section states in text; `provision` is
+   * what the lens uncovers — so the reveal names something real (contrast,
+   * captions, keyboard operation, plain language) rather than decorating.
+   */
+  modes: [
+    { key: "visao", name: "Visão", provision: "Contraste", color: "blue" as SquareColor },
+    { key: "audicao", name: "Audição", provision: "Legendas", color: "green" as SquareColor },
+    { key: "mobilidade", name: "Mobilidade", provision: "Teclado", color: "yellow" as SquareColor },
+    { key: "cognicao", name: "Cognição", provision: "Clareza", color: "red" as SquareColor },
   ],
+
+  desk: {
+    title: "Disability Answer Desk",
+    body: "Suporte dedicado a clientes com deficiência em Microsoft 365, Windows, Xbox e Surface.",
+    cta: "Conhecer o suporte de acessibilidade",
+    href: "https://www.microsoft.com/pt-br/accessibility/disability-answer-desk",
+  },
 };
 
 export const elevate = {
