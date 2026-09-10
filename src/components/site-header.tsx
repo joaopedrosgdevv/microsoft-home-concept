@@ -52,8 +52,13 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-full max-w-[100rem] items-center gap-8 px-gutter md:px-8">
+        {/* The only link on the page that points at a route rather than a
+            hash or an external URL, so it is the only one that stays a
+            next/link. Prefetching is off: the route it would fetch is the
+            one the visitor is already reading. */}
         <Link
           href="/"
+          prefetch={false}
           className="-mx-2 flex h-11 items-center px-2 text-white"
           aria-label="Microsoft — página inicial"
         >
@@ -64,7 +69,7 @@ export function SiteHeader() {
           <ul className="flex items-center">
             {nav.map((item, i) => (
               <li key={item.href}>
-                <Link
+                <a
                   href={item.href}
                   className={cn(
                     "group/nav t-label relative flex h-11 items-center px-3.5 text-[0.9375rem]",
@@ -81,7 +86,7 @@ export function SiteHeader() {
                     )}
                     style={{ backgroundColor: ACCENT[i] }}
                   />
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
@@ -90,11 +95,14 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           <Action
             href="https://www.microsoft.com/en-us/investor"
+            target="_blank"
+            rel="noopener noreferrer"
             variant="ghost"
             size="sm"
             className="hidden md:inline-flex"
           >
             Investidores
+            <span className="sr-only"> (abre em nova aba)</span>
           </Action>
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -138,7 +146,7 @@ export function SiteHeader() {
                       className="border-t border-[var(--edge)]"
                     >
                       <SheetClose asChild>
-                        <Link
+                        <a
                           href={item.href}
                           className="t-display flex min-h-16 items-center gap-4 py-3 text-[1.5rem] text-white"
                         >
@@ -148,7 +156,7 @@ export function SiteHeader() {
                             style={{ backgroundColor: ACCENT[i] }}
                           />
                           {item.label}
-                        </Link>
+                        </a>
                       </SheetClose>
                     </li>
                   ))}
@@ -156,10 +164,13 @@ export function SiteHeader() {
 
                 <Action
                   href="https://www.microsoft.com/en-us/investor"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   variant="ghost"
                   className="mt-7 w-full"
                 >
                   Relações com investidores
+                  <span className="sr-only"> (abre em nova aba)</span>
                 </Action>
               </nav>
             </SheetContent>

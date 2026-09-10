@@ -24,6 +24,15 @@
   --color-mist: #ced3e0;
   --color-fog: #9aa1b4;
 
+  /*
+   * Daylight. One section is set in it — the one about legibility — so the
+   * near-whites are cool rather than the warm paper the rest of the web uses,
+   * and stay in the same blue family as the darks they interrupt.
+   */
+  --color-day: #eceff5;
+  --color-day-2: #e1e6ef;
+  --color-day-line: #ccd3e0;
+
   --color-sq-red: #f25022;
   --color-sq-green: #7fba00;
   --color-sq-blue: #00a4ef;
@@ -43,7 +52,7 @@
 
 @layer base {
   :root {
-    color-scheme: light;
+    color-scheme: dark;
     /* Header height, read by scroll-margin + hero sizing. */
     --header-h: 3.5rem;
     /* Hairline on the dark stage. Too faint to see as a line, enough to
@@ -69,7 +78,7 @@
   }
 
   body {
-    background-color: var(--color-paper);
+    background-color: var(--color-void);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-variation-settings: "wdth" 100;
@@ -93,6 +102,10 @@
   .on-deep :focus-visible,
   .on-void :focus-visible {
     outline-color: #ffffff;
+  }
+
+  .on-day :focus-visible {
+    outline-color: var(--color-ink);
   }
 
   ::selection {
@@ -170,6 +183,21 @@
     120% 90% at 50% 32%,
     #000 0%,
     rgb(0 0 0 / 0.5) 55%,
+    transparent 100%
+  );
+}
+
+/* The same plan seen in daylight. Kept so the one light section still reads
+   as the same building, not a different site. */
+.stage-grid-day {
+  background-image:
+    linear-gradient(to right, rgb(22 22 26 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(22 22 26 / 0.07) 1px, transparent 1px);
+  background-size: 7rem 7rem;
+  mask-image: radial-gradient(
+    110% 80% at 50% 40%,
+    #000 0%,
+    rgb(0 0 0 / 0.45) 55%,
     transparent 100%
   );
 }
@@ -397,12 +425,16 @@
 }
 
 /*
- * Reveal primitive: GSAP clears these once played. Static when motion is
- * reduced, and never armed at all unless the .js-motion gate (set inline in
- * the document head) confirms a script is running to undo it.
+ * Reveal primitive: GSAP clears these once played.
+ *
+ * The hidden state is only armed when something can undo it — `scripting` says
+ * whether scripts are running, so with JavaScript off the copy is simply
+ * visible and no inline gate script is needed. That matters beyond tidiness:
+ * the gate used to add a class to <html> before hydration, which is a
+ * server/client attribute mismatch by construction, and React reports it.
  */
-@media (prefers-reduced-motion: no-preference) {
-  .js-motion [data-reveal] {
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  [data-reveal] {
     opacity: 0;
     transform: translate3d(0, 1.25rem, 0);
   }
@@ -426,4 +458,204 @@
   .sys-space {
     transform: rotateX(-11deg) rotateY(-16deg);
   }
+}
+
+/* ==========================================================================
+   Commitments — the room takes the colour of whatever you are reading
+   ========================================================================== */
+
+/*
+ * Four ambient layers stacked, one per commitment, cross-faded by opacity.
+ * Transitioning `background` between gradients does not interpolate, so the
+ * light is four fixed lamps being turned up and down instead.
+ */
+.lamp {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease-out-quint);
+}
+
+.lamp[data-live] {
+  opacity: 1;
+}
+
+/* The spine the four commitments hang from. */
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--edge-strong) 12%,
+    var(--edge-strong) 88%,
+    transparent 100%
+  );
+}
+
+.knot {
+  position: absolute;
+  left: 0;
+  translate: -50% 0;
+  border-radius: 1px;
+  transition:
+    box-shadow 700ms var(--ease-out-expo),
+    scale 700ms var(--ease-out-expo);
+}
+
+.knot[data-live] {
+  scale: 1.35;
+  box-shadow: 0 0 2.5rem -0.125rem var(--c);
+}
+
+/* ==========================================================================
+   Results — growth as light on a track
+   ========================================================================== */
+
+.track {
+  position: relative;
+  height: 0.3125rem;
+  background: rgb(255 255 255 / 0.055);
+  overflow: hidden;
+}
+
+.track-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--w, 0%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--c) 22%, transparent) 0%,
+    var(--c) 88%,
+    #ffffff 100%
+  );
+  box-shadow: 0 0 1.75rem -0.125rem color-mix(in oklab, var(--c) 75%, transparent);
+  transform-origin: left center;
+}
+
+/* ==========================================================================
+   Platform — the ecosystem
+   ========================================================================== */
+
+.eco {
+  --dim: 0.42;
+}
+
+/* Everything dims except the branch you are on. Opacity rather than colour,
+   so the four hues never shift and the diagram stays one object. */
+.eco-branch {
+  opacity: 1;
+  transition: opacity 600ms var(--ease-out-quint);
+}
+
+.eco[data-active] .eco-branch {
+  opacity: var(--dim);
+}
+
+.eco[data-active] .eco-branch[data-live] {
+  opacity: 1;
+}
+
+.eco-orbit {
+  transform-origin: 300px 300px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .eco-orbit {
+    animation: eco-drift 300s linear infinite;
+  }
+
+  .eco-branch[data-live] .eco-pulse {
+    animation: eco-pulse 2.6s var(--ease-out-quint) infinite;
+  }
+}
+
+.eco-pulse {
+  opacity: 0;
+}
+
+@keyframes eco-drift {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes eco-pulse {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--reach) 0;
+  }
+}
+
+/* ==========================================================================
+   Sustainability — a limb, an atmosphere and a sun
+   ========================================================================== */
+
+.limb {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: 240%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      60% 42% at 72% 4%,
+      rgb(28 44 68 / 0.85) 0%,
+      transparent 62%
+    ),
+    linear-gradient(to bottom, #0b1220 0%, #05060a 34%);
+  box-shadow: inset 0 1px 0 0 rgb(180 214 255 / 0.32);
+}
+
+/* The air above the ground: a bright rim that follows the same curve and sits
+   just outside it. */
+.airglow {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: 240%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow:
+    0 0 5rem 0.5rem rgb(0 164 239 / 0.28),
+    0 0 14rem 2rem rgb(127 186 0 / 0.14);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .airglow {
+    animation: airglow 14s ease-in-out infinite;
+  }
+}
+
+@keyframes airglow {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Closing — the mark comes back together
+   ========================================================================== */
+
+.assemble {
+  transition: box-shadow 700ms var(--ease-out-expo);
 }

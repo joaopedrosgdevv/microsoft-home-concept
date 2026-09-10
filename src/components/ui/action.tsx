@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
@@ -17,6 +16,11 @@ type Size = "md" | "sm";
  * Variant/size record and the `data-variant` hook follow shadcn/ui's `button`
  * (fetched through the shadcn MCP); the dependency is not — the project already
  * has `cn`, and one component does not justify class-variance-authority.
+ *
+ * A plain anchor, not next/link. Every destination on the page is either an
+ * in-page hash or an absolute microsoft.com URL, so there is no client route to
+ * navigate to and nothing worth prefetching; Link only added an RSC request for
+ * the page the visitor is already on.
  *
  * Square, because the brand mark is square and a radius here would be the only
  * curve on the page. What makes these read as pressable is not a corner but
@@ -63,11 +67,11 @@ export function Action({
   className,
   children,
   ...props
-}: ComponentProps<typeof Link> & { variant?: Variant; size?: Size }) {
+}: ComponentProps<"a"> & { variant?: Variant; size?: Size }) {
   const isPrimary = variant === "primary";
 
   return (
-    <Link
+    <a
       data-variant={variant}
       className={cn(base, sizes[size], variants[variant], className)}
       {...props}
@@ -95,7 +99,7 @@ export function Action({
       <span className={cn("relative inline-flex items-center gap-2.5")}>
         {children}
       </span>
-    </Link>
+    </a>
   );
 }
 
@@ -103,9 +107,9 @@ export function Action({
 export function TextLink({
   className,
   ...props
-}: ComponentProps<typeof Link>) {
+}: ComponentProps<"a">) {
   return (
-    <Link
+    <a
       className={cn(
         "text-action underline decoration-action/35 underline-offset-4",
         "transition-colors duration-200 hover:text-action-hover hover:decoration-action",

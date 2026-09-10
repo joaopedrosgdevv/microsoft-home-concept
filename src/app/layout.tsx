@@ -70,10 +70,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // The page opens on the dark stage, so browser chrome should match it
-  // rather than flash white above the hero.
+  // The page is a dark stage from the hero to the footer, with one daylight
+  // band in the middle, so browser chrome and form controls follow it.
   themeColor: "#05060a",
-  colorScheme: "light",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };
@@ -82,26 +82,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // The head script below adds a class to this element before React
-    // hydrates, which is the whole point of it running early.
-    <html
-      lang="pt-BR"
-      className={`${archivo.variable} ${display.variable}`}
-      suppressHydrationWarning
-    >
-      <head>
-        {/*
-         * Scroll reveals start at opacity 0, so the copy would stay invisible
-         * if the script that reveals it never arrives. This gate runs before
-         * first paint and is the only thing that arms the hidden state, which
-         * means the server-rendered page is fully readable without JavaScript.
-         */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add("js-motion")`,
-          }}
-        />
-      </head>
+    <html lang="pt-BR" className={`${archivo.variable} ${display.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

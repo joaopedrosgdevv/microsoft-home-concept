@@ -1,48 +1,40 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Section opener. The eyebrow is a condensed sentence-case label rather than
- * tracked-out caps, and it carries a rule that ties it to the heading below.
+ * The one type treatment every section shares.
+ *
+ * No eyebrow above it. The headings already say what each section is, and a
+ * label repeating that in smaller type is the tell of a template rather than
+ * information. What carries section identity instead is the composition
+ * underneath and the colour the section is lit with.
  */
 export function SectionHeading({
   id,
-  eyebrow,
   title,
+  tone = "dark",
+  size = "md",
   className,
-  tone = "light",
 }: {
   id: string;
-  eyebrow: string;
-  title: string;
+  title: React.ReactNode;
+  tone?: "dark" | "day";
+  size?: "md" | "lg";
   className?: string;
-  tone?: "light" | "dark";
 }) {
   return (
-    <div data-reveal className={className}>
-      <p
-        className={cn(
-          "t-label mb-5 flex items-center gap-3 text-label",
-          tone === "dark" ? "text-deep-muted" : "text-ink-muted",
-        )}
-      >
-        <span
-          aria-hidden="true"
-          className={cn(
-            "h-px w-8",
-            tone === "dark" ? "bg-deep-line" : "bg-line",
-          )}
-        />
-        {eyebrow}
-      </p>
-      <h2
-        id={id}
-        className={cn(
-          "t-title max-w-[18ch] text-[clamp(1.875rem,5.2vw,3.25rem)]",
-          tone === "dark" ? "text-white" : "text-ink",
-        )}
-      >
-        {title}
-      </h2>
-    </div>
+    <h2
+      id={id}
+      data-reveal
+      className={cn(
+        "t-display",
+        size === "lg"
+          ? "text-[clamp(2.25rem,6vw,4.25rem)]"
+          : "text-[clamp(2rem,4.6vw,3.25rem)]",
+        tone === "day" ? "text-ink" : "text-white",
+        className,
+      )}
+    >
+      {title}
+    </h2>
   );
 }

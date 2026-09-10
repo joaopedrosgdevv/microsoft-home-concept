@@ -22,15 +22,21 @@ import { useEffect } from "react";
  *
  * Under `prefers-reduced-motion: reduce` nothing runs: the stylesheet already
  * leaves every element in its final state, so the page is static rather than
- * animated-then-snapped.
+ * animated-then-snapped. The same is true with JavaScript off — the hidden
+ * state is behind `@media (scripting: enabled)`.
  */
 export function MotionProvider() {
   useEffect(() => {
-    // The hidden state is armed by the .js-motion gate in the document head.
-    // If this layer cannot start, drop the gate so the copy is shown rather
-    // than left invisible.
+    // The stylesheet hides these because a script is running to bring them
+    // back. If this layer cannot start, put them back by hand rather than
+    // leave the copy invisible.
     const failOpen = () =>
-      document.documentElement.classList.remove("js-motion");
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal]")
+        .forEach((el) => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

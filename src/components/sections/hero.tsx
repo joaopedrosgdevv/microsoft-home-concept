@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 import { HeroSystem } from "@/components/hero-system";
 import { Action } from "@/components/ui/action";
@@ -119,7 +118,7 @@ export function Hero() {
                   i > 0 ? "lg:border-l" : "",
                 ].join(" ")}
               >
-                <Link
+                <a
                   href="#plataforma"
                   onPointerEnter={() => setActive(item.color)}
                   onPointerLeave={() => setActive(null)}
@@ -147,7 +146,7 @@ export function Hero() {
                     {item.lead}
                   </span>
                   <span className="sr-only"> — ver na seção Plataforma</span>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
@@ -155,9 +154,13 @@ export function Hero() {
       </div>
 
       {/*
-       * The seam. The stage does not stop at a border — daylight from the next
-       * section rises into it and takes over, so the scroll reads as one move
-       * from night into the page proper.
+       * The seam. The stage does not stop at a border: light from the section
+       * below rises into it, so the scroll reads as one continuous room rather
+       * than two bands meeting at an edge.
+       *
+       * This is the only part of the approved hero that changed after the rest
+       * of the page was rebuilt — it used to fade into daylight, because the
+       * section under it was light. It is dark now.
        */}
       <div
         aria-hidden="true"
@@ -167,14 +170,14 @@ export function Hero() {
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(72% 128% at 50% 122%, rgb(214 228 246 / 0.55) 0%, transparent 68%)",
+              "radial-gradient(58% 120% at 50% 122%, rgb(0 106 189 / 0.28) 0%, transparent 70%)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 0%, var(--color-surface) 88%)",
+              "linear-gradient(to bottom, transparent 0%, var(--color-void) 92%)",
           }}
         />
       </div>
