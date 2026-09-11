@@ -216,6 +216,7 @@ Desenvolvido por **João Pedro**.
 * [LinkedIn](https://www.linkedin.com/in/joao-pedro-de-souza-gomes/)
 * [Instagram](https://www.instagram.com/joao.pedrodev/)
 * [GitHub](https://github.com/joaopedrosgdevv)
+* [Site publicado](https://microsoft-home-concept.vercel.app)
 
 ---
 
